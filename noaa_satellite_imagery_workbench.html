@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOAA 卫星云图工作台</title>
+<style>
+:root{color-scheme:dark;--bg:#07101b;--panel:#0e1a29;--panel2:#132438;--line:#24384d;--text:#e9f2fb;--muted:#9db0c5;--cyan:#59d8e8;--lime:#a2e6c0;--amber:#e8c879}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 12% -10%,#1c3a52 0,transparent 42%),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px clamp(14px,3vw,38px);border-bottom:1px solid var(--line);background:#07101bd9;position:sticky;top:0;z-index:3;backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px}.mark{height:42px;width:42px;border-radius:12px;background:linear-gradient(145deg,#59d8e8,#3676c5);display:grid;place-items:center;color:#06101a;font-size:22px;font-weight:900}.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase}.brand h1{font-size:20px;margin:1px 0 0;letter-spacing:-.02em}.top-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pill{border:1px solid #285743;background:#102b27;color:var(--lime);border-radius:999px;padding:6px 10px;font-size:11px}.clock{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+main{max-width:1500px;margin:auto;padding:24px clamp(12px,2.8vw,34px) 38px}.hero{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:18px;flex-wrap:wrap}.hero h2{font-size:clamp(23px,3vw,34px);line-height:1.12;margin:0 0 8px;letter-spacing:-.035em}.hero p{max-width:740px;color:var(--muted);margin:0}.actions{display:flex;gap:8px;flex-wrap:wrap}button,a.button{border:1px solid #34506b;background:#14273b;color:var(--text);padding:10px 13px;border-radius:9px;font:inherit;font-size:13px;font-weight:650;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}button.primary,a.button.primary{background:var(--cyan);color:#06131d;border-color:var(--cyan)}button:hover,a.button:hover{filter:brightness(1.1)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}.stat{border:1px solid var(--line);background:linear-gradient(140deg,#122338,#0d1a29);border-radius:12px;padding:13px 15px}.stat label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.stat strong{font-size:16px;font-weight:650}.stat small{display:block;color:#7189a2;font-size:11px;margin-top:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 295px;gap:15px;align-items:start}.panel{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;box-shadow:0 14px 38px #0002}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line);flex-wrap:wrap}.panel-head h3{font-size:14px;margin:0}.muted{color:var(--muted);font-size:11px}.viewer{position:relative;background:#03080e;min-height:400px;display:grid;place-items:center;overflow:hidden}.image-wrap{width:100%;min-height:400px;display:grid;place-items:center;background:radial-gradient(ellipse at center,#0b1b2b,#03080e);position:relative}.image-wrap img{display:block;width:100%;height:auto;max-height:70vh;object-fit:contain;min-height:250px}.image-wrap .placeholder{padding:38px 20px;text-align:center;color:var(--muted)}.overlay-tag{position:absolute;left:13px;top:13px;padding:6px 9px;border-radius:7px;background:#07101bd9;border:1px solid #3b5369;font-size:11px;z-index:1}.overlay-tag.right{left:auto;right:13px}.img-footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.side{display:grid;gap:13px}.controls{padding:15px}.controls h3{font-size:14px;margin:0 0 14px}.field{display:grid;gap:6px;margin-bottom:13px}.field label{color:var(--muted);font-size:11px}.field select,.field input{width:100%;padding:10px 11px;border-radius:8px;background:#071421;border:1px solid #2c435a;color:var(--text);font:inherit;font-size:13px;min-width:0}.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.full{width:100%}.link-list{display:grid;gap:7px}.link-list a{color:#dcecff;text-decoration:none;padding:9px 10px;border-radius:8px;background:#0a1725;border:1px solid #22384d;font-size:12px}.link-list a:hover{border-color:var(--cyan)}.notice{padding:12px 14px;margin-top:15px;border-radius:10px;border:1px solid #5d4d2b;background:#292316;color:#e9d9aa;font-size:12px}.notice strong{color:#f5e7b7}.error{display:none;margin:12px 14px;padding:10px;border:1px solid #70454a;background:#2c171b;border-radius:8px;color:#f3c3c7;font-size:12px}.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#71869d;font-size:11px;margin-top:18px}.foot a{color:var(--cyan)}.hint{color:var(--muted);font-size:11px;margin:9px 0 0}.loadbar{height:2px;background:#17283a}.loadbar span{display:block;height:100%;width:0;background:var(--cyan);transition:width .25s}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.side{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.image-wrap img{max-height:none}}
+@media(max-width:600px){header{position:static}.brand h1{font-size:17px}.top-right{justify-content:flex-end}.clock{display:none}.side{grid-template-columns:1fr}.hero .actions{width:100%}.hero .actions>*{flex:1}.stats{gap:7px}.stat{padding:10px}.stat strong{font-size:14px}.viewer,.image-wrap{min-height:280px}.image-wrap img{min-height:200px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">N</div><div><div class="eyebrow">NOAA · NESDIS · SATELLITE</div><h1>卫星云图工作台</h1></div></div>
+  <div class="top-right"><span class="pill">● NOAA 公共图像服务</span><span class="clock" id="clock">本地时间 —</span></div>
+</header>
+<main>
+  <section class="hero">
+    <div><h2>实时云图 · 直接图像调用</h2><p>直接请求 NOAA NESDIS ArcGIS ImageServer 的图像导出接口。可切换最新 GeoColor、近 24 小时档案、显示区域与图像尺寸；不再依赖嵌入 NOAA 官网网页。</p></div>
+    <div class="actions"><button class="primary" id="refresh">↻ 刷新图像</button><a class="button" id="openApi" href="https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/Most_Recent_MERGEDGC/ImageServer" target="_blank" rel="noopener">↗ 查看 API</a></div>
+  </section>
+  <section class="stats">
+    <div class="stat"><label>数据机构</label><strong>NOAA / NESDIS</strong><small>美国国家海洋和大气管理局</small></div>
+    <div class="stat"><label>图像产品</label><strong id="statProduct">Most Recent GeoColor</strong><small>GOES-East + GOES-West 合成</small></div>
+    <div class="stat"><label>服务更新特性</label><strong id="statCadence">约 10 分钟时间窗</strong><small>具体时次以服务元数据为准</small></div>
+    <div class="stat"><label>图像输出</label><strong id="statSize">1600 × 900</strong><small>按当前范围请求生成</small></div>
+  </section>
+  <section class="layout">
+    <div class="panel">
+      <div class="panel-head"><h3 id="imageTitle">NOAA GeoColor · 最新图像</h3><span class="muted" id="imageStatus">等待加载</span></div>
+      <div class="loadbar"><span id="loadbar"></span></div>
+      <div class="viewer">
+        <div class="overlay-tag" id="regionBadge">全球合成范围</div>
+        <div class="overlay-tag right">LIVE IMAGE REQUEST</div>
+        <div class="image-wrap" id="imageWrap"><div class="placeholder">正在请求 NOAA 图像服务…</div></div>
+      </div>
+      <div class="error" id="errorBox"></div>
+      <div class="img-footer"><span id="requestInfo">图像将直接由 NOAA ImageServer 返回</span><span>© NOAA / NESDIS · 请遵守官方数据使用条款</span></div>
+    </div>
+    <aside class="side">
+      <div class="panel controls">
+        <h3>图像请求设置</h3>
+        <div class="field"><label for="product">数据产品</label><select id="product">
+          <option value="recent">最新 GeoColor（近实时）</option>
+          <option value="latest">最新 GeoColor（非时间图层）</option>
+          <option value="archive">过去 24 小时档案</option>
+        </select></div>
+        <div class="field"><label for="region">显示区域</label><select id="region">
+          <option value="americas">美洲 / GOES 重点覆盖</option>
+          <option value="northamerica">北美与中美洲</option>
+          <option value="global">全球视图（部分区域可能无有效数据）</option>
+          <option value="westpacific">西北太平洋（覆盖可能有限）</option>
+          <option value="custom">自定义经纬度范围</option>
+        </select></div>
+        <div id="customBox" style="display:none">
+          <div class="pair">
+            <div class="field"><label for="xmin">最西经度</label><input id="xmin" type="number" value="100" min="-180" max="180"></div>
+            <div class="field"><label for="xmax">最东经度</label><input id="xmax" type="number" value="180" min="-180" max="180"></div>
+            <div class="field"><label for="ymin">最南纬度</label><input id="ymin" type="number" value="-10" min="-90" max="90"></div>
+            <div class="field"><label for="ymax">最北纬度</label><input id="ymax" type="number" value="60" min="-90" max="90"></div>
+          </div>
+        </div>
+        <div class="field"><label for="size">图像分辨率</label><select id="size">
+          <option value="1200,675">1200 × 675（标准）</option>
+          <option value="1600,900" selected>1600 × 900（高清）</option>
+          <option value="2400,1350">2400 × 1350（大图）</option>
+        </select></div>
+        <button class="primary full" id="apply">获取卫星云图</button>
+        <p class="hint">请求采用 bbox（EPSG:4326）和 exportImage 操作。切换到历史档案时，默认请求服务当前可用的最新拼图；精确历史时刻需额外设置 time 参数。</p>
+      </div>
+      <div class="panel controls">
+        <h3>官方数据服务</h3>
+        <div class="link-list">
+          <a href="https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/Most_Recent_MERGEDGC/ImageServer" target="_blank" rel="noopener">最新 GeoColor · 时间图层 ↗</a>
+          <a href="https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/MERGED_GeoColor/ImageServer" target="_blank" rel="noopener">最新 GeoColor · 当前图层 ↗</a>
+          <a href="https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/MERGEDGC_Last_24hr/ImageServer" target="_blank" rel="noopener">过去 24 小时档案 ↗</a>
+          <a href="https://www.goes.noaa.gov/" target="_blank" rel="noopener">NOAA GOES 官方查看器 ↗</a>
+        </div>
+      </div>
+      <div class="panel controls">
+        <h3>数据说明</h3>
+        <div class="field"><label>图像类型</label><div>GeoColor 彩色合成图</div></div>
+        <div class="field"><label>更新频率</label><div>依扫描模式约 10–15 分钟</div></div>
+        <div class="field"><label>覆盖范围</label><div>GOES-East / GOES-West 为主</div></div>
+        <p class="hint">GOES 主要观测美洲及邻近海域。西北太平洋区域即使可请求到全球范围图片，也可能缺少有效卫星观测，不应视为完整覆盖。</p>
+      </div>
+    </aside>
+  </section>
+  <div class="notice"><strong>重要：</strong>本页面直接调用 NOAA 公共 ImageServer 的 exportImage 接口。图像加载成功后才代表本次请求返回了图像；如果服务暂时不可用、网络拦截或某区域没有有效覆盖，页面会显示错误提示。服务时间与图像时间请以 NOAA 元数据为准。</div>
+  <footer class="foot"><span>接口：<a href="https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/Most_Recent_MERGEDGC/ImageServer" target="_blank" rel="noopener">NOAA NESDIS ArcGIS ImageServer</a></span><span>单文件 HTML · 无需构建工具 · 需要联网</span></footer>
+</main>
+<script>
+const services={
+ recent:{url:"https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/Most_Recent_MERGEDGC/ImageServer",name:"Most Recent GeoColor",cadence:"约 10 分钟时间窗"},
+ latest:{url:"https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/MERGED_GeoColor/ImageServer",name:"Latest GeoColor",cadence:"最新可用拼图"},
+ archive:{url:"https://satellitemaps.nesdis.noaa.gov/arcgis/rest/services/MERGEDGC_Last_24hr/ImageServer",name:"GeoColor · 24h Archive",cadence:"滚动 24 小时档案"}
+};
+const regions={
+ americas:{bbox:[-145,-55,-20,65],label:"美洲 / GOES 重点覆盖"},
+ northamerica:{bbox:[-145,0,-35,65],label:"北美与中美洲"},
+ global:{bbox:[-180,-60,180,70],label:"全球视图 · 覆盖不均"},
+ westpacific:{bbox:[100,-10,180,60],label:"西北太平洋 · 覆盖可能有限"}
+};
+const $=id=>document.getElementById(id);
+function bboxFromUI(){
+ const r=$("region").value;
+ if(r!=="custom")return regions[r].bbox;
+ const b=[$("xmin").value,$("ymin").value,$("xmax").value,$("ymax").value].map(Number);
+ if(b.some(v=>!Number.isFinite(v))||b[0]>=b[2]||b[1]>=b[3]||b[0]<-180||b[2]>180||b[1]<-90||b[3]>90)throw new Error("自定义经纬度范围无效，请检查经纬度上下限。");
+ return b;
+}
+function buildUrl(){
+ const p=services[$("product").value],b=bboxFromUI(),size=$("size").value;
+ const q=new URLSearchParams({bbox:b.join(","),bboxSR:"4326",imageSR:"4326",size,format:"jpgpng",f:"image",pixelType:"U8",interpolation:"RSP_BilinearInterpolation"});
+ return {url:p.url+"/exportImage?"+q.toString(),service:p,bbox:b,size};
+}
+function loadImage(){
+ const wrap=$("imageWrap"),err=$("errorBox"),bar=$("loadbar");
+ err.style.display="none";err.textContent="";bar.style.width="25%";$("imageStatus").textContent="正在请求 NOAA…";
+ let req;
+ try{req=buildUrl()}catch(e){err.textContent=e.message;err.style.display="block";$("imageStatus").textContent="参数错误";bar.style.width="0";return}
+ const img=new Image();img.alt="NOAA NESDIS GeoColor satellite imagery";img.decoding="async";
+ img.onload=()=>{
+  wrap.replaceChildren(img);bar.style.width="100%";$("imageStatus").textContent="图像已加载 · "+new Date().toLocaleTimeString("zh-CN",{hour12:false});
+  $("imageTitle").textContent="NOAA GeoColor · "+req.service.name;
+  $("statProduct").textContent=req.service.name;$("statCadence").textContent=req.service.cadence;$("statSize").textContent=req.size.replace(","," × ");
+  const r=$("region").value;$("regionBadge").textContent=r==="custom"?"自定义范围":regions[r].label;
+  $("requestInfo").textContent="请求范围："+req.bbox.join(", ")+" · EPSG:4326";
+  $("openApi").href=req.service.url;
+  bar.style.width="100%";
+ };
+ img.onerror=()=>{
+  wrap.innerHTML='<div class="placeholder"><strong>NOAA 图像暂时无法显示</strong><br><br>可能原因：服务暂时不可用、网络或浏览器扩展拦截，或者所选区域没有有效图像。<br><br><a class="button primary" href="'+req.url.replace(/&/g,"&amp;")+'" target="_blank" rel="noopener">直接打开图像请求</a></div>';
+  err.textContent="图像请求未能在页面中显示。可以点击“直接打开图像请求”检查 NOAA 服务响应，或切换到美洲区域重试。";
+  err.style.display="block";$("imageStatus").textContent="加载失败";bar.style.width="0";
+ };
+ img.src=req.url;
+}
+$("refresh").addEventListener("click",loadImage);$("apply").addEventListener("click",loadImage);
+$("region").addEventListener("change",()=>{$("customBox").style.display=$("region").value==="custom"?"block":"none"});
+$("product").addEventListener("change",()=>{const p=services[$("product").value];$("statProduct").textContent=p.name;$("statCadence").textContent=p.cadence;$("openApi").href=p.url});
+function clock(){ $("clock").textContent="本地时间 "+new Intl.DateTimeFormat("zh-CN",{hour12:false,dateStyle:"medium",timeStyle:"medium"}).format(new Date())}
+clock();setInterval(clock,1000);loadImage();
+</script>
+</body>
+</html>
